@@ -13,13 +13,21 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as AnimeSlugImport } from './routes/anime.$slug'
+import { Route as AnimeSlugEpisodeIdImport } from './routes/anime_.$slug.$episodeId'
 
 // Create Virtual Routes
 
+const FavoritesLazyImport = createFileRoute('/favorites')()
 const AboutLazyImport = createFileRoute('/about')()
 const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
+
+const FavoritesLazyRoute = FavoritesLazyImport.update({
+  path: '/favorites',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/favorites.lazy').then((d) => d.Route))
 
 const AboutLazyRoute = AboutLazyImport.update({
   path: '/about',
@@ -30,6 +38,16 @@ const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+
+const AnimeSlugRoute = AnimeSlugImport.update({
+  path: '/anime/$slug',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AnimeSlugEpisodeIdRoute = AnimeSlugEpisodeIdImport.update({
+  path: '/anime/$slug/$episodeId',
+  getParentRoute: () => rootRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -49,6 +67,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutLazyImport
       parentRoute: typeof rootRoute
     }
+    '/favorites': {
+      id: '/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof FavoritesLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/anime/$slug': {
+      id: '/anime/$slug'
+      path: '/anime/$slug'
+      fullPath: '/anime/$slug'
+      preLoaderRoute: typeof AnimeSlugImport
+      parentRoute: typeof rootRoute
+    }
+    '/anime/$slug/$episodeId': {
+      id: '/anime/$slug/$episodeId'
+      path: '/anime/$slug/$episodeId'
+      fullPath: '/anime/$slug/$episodeId'
+      preLoaderRoute: typeof AnimeSlugEpisodeIdImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -57,6 +96,9 @@ declare module '@tanstack/react-router' {
 export const routeTree = rootRoute.addChildren({
   IndexLazyRoute,
   AboutLazyRoute,
+  FavoritesLazyRoute,
+  AnimeSlugRoute,
+  AnimeSlugEpisodeIdRoute,
 })
 
 /* prettier-ignore-end */
@@ -68,7 +110,10 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/about"
+        "/about",
+        "/favorites",
+        "/anime/$slug",
+        "/anime/$slug/$episodeId"
       ]
     },
     "/": {
@@ -76,6 +121,15 @@ export const routeTree = rootRoute.addChildren({
     },
     "/about": {
       "filePath": "about.lazy.tsx"
+    },
+    "/favorites": {
+      "filePath": "favorites.lazy.tsx"
+    },
+    "/anime/$slug": {
+      "filePath": "anime.$slug.tsx"
+    },
+    "/anime/$slug/$episodeId": {
+      "filePath": "anime_.$slug.$episodeId.tsx"
     }
   }
 }
