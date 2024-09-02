@@ -20,6 +20,7 @@ import axios from "@/lib/axios";
 import { Anime } from "@/models/anime";
 import { createFileRoute, Link, useLoaderData } from "@tanstack/react-router";
 import { Calendar, Clock, Languages } from "lucide-react";
+import { useState } from "react";
 
 const fetchAnime = async (slug: string) => {
   const { data } = await axios.get(`/api/v1/anime/${slug}`);
@@ -36,6 +37,36 @@ export const Route = createFileRoute("/anime/$slug")({
 
 function AnimePage() {
   const anime: Anime = useLoaderData({ from: "/anime/$slug" });
+  const [watchList, setWatchList] = useState<Anime[]>(() => {
+    const watchlist = window.localStorage.getItem("watchlist");
+    if (watchlist) {
+      return JSON.parse(watchlist);
+    }
+    return [];
+  });
+  const isOnWatchlist = watchList.find(
+    (animeFromWl) => animeFromWl.id === anime.id
+  );
+
+  const handleAddToWatchlist = () => {
+    if (watchList.find((animeFromWl) => animeFromWl.id === anime.id)) {
+      const updatedWatchlist = watchList.filter(
+        (animeFromWl) => animeFromWl.id !== anime.id
+      );
+
+      setWatchList(updatedWatchlist);
+      window.localStorage.setItem(
+        "watchlist",
+        JSON.stringify(updatedWatchlist)
+      );
+
+      return;
+    }
+
+    const updatedWatchlist = [...watchList, anime];
+    setWatchList(updatedWatchlist);
+    window.localStorage.setItem("watchlist", JSON.stringify(updatedWatchlist));
+  };
 
   return (
     <div className='container mx-auto p-4'>
@@ -65,9 +96,15 @@ function AnimePage() {
                     ))}
                 </div>
 
-                <Button className='py-2'>Add to Watchlist</Button>
+                <Button
+                  onClick={handleAddToWatchlist}
+                  className='py-2'
+                  variant={isOnWatchlist ? "destructive" : "default"}
+                >
+                  {isOnWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
+                </Button>
               </div>
-              <div className='flex items-center gap-4'>
+              <div className='flex items-center gap-4 mt-4'>
                 <div className='flex items-center'>
                   <Clock className='w-5 h-5 mr-1' />
                   <span>{anime.totalEpisodes} episodes</span>

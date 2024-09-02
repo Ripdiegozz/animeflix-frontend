@@ -8,6 +8,12 @@ export interface TopAnime {
   episodeNumber: number;
 }
 
+export interface TopAnimeResponse {
+  currentPage: number;
+  hasNextPage: boolean;
+  results: TopAnime[];
+}
+
 export interface Anime {
   id: string;
   title: string;
@@ -28,4 +34,19 @@ export interface Episode {
   id: string;
   number: number;
   url: string;
+}
+
+export interface AnimeSearchResponse {
+  currentPage: number;
+  hasNextPage: boolean;
+  results: Anime[];
+}
+
+export interface AnimeSearch {
+  id: string;
+  title: string;
+  url: string;
+  image: string;
+  releaseDate: string;
+  subOrDub: string;
 }

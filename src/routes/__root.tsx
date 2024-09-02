@@ -1,15 +1,35 @@
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { CommandPallete } from "@/components/cmdk";
+import { ModeToggle } from "@/components/ui/theme-toggle";
+import { Footer } from "@/components/footer";
 
 export const Route = createRootRoute({
   component: () => (
     <>
+      <Header />
+      <hr />
+      <Outlet />
+      <Footer />
+      <TanStackRouterDevtools />
+    </>
+  ),
+});
+
+function Header() {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  return (
+    <>
       <div className='p-2 flex gap-2 w-full'>
-        <header className='bg-muted px-4 py-3 flex items-center justify-between w-full'>
+        <header className='bg-muted rounded-md px-4 py-3 flex items-center justify-between w-full'>
           <Link href='/' className='flex items-center gap-2'>
-            <PlayIcon className='w-6 h-6' />
-            <span className='text-lg font-semibold'>Animeflix</span>
+            <Button variant='ghost'>
+              <span className='text-lg font-semibold'>🦊 Animeflix</span>
+            </Button>
           </Link>
           <nav className='hidden sm:flex items-center gap-4'>
             <Link
@@ -19,63 +39,38 @@ export const Route = createRootRoute({
               Home
             </Link>
             <Link
-              to='/about'
+              to='/discover'
               className='text-muted-foreground hover:text-foreground'
             >
               Discover
             </Link>
             <Link
-              to='/favorites'
+              to='/watchlist'
               className='text-muted-foreground hover:text-foreground'
             >
-              Favorites
+              Watchlist
             </Link>
           </nav>
           <div className='flex items-center gap-2'>
-            <Button variant='ghost' size='icon' className='rounded-full'>
+            <Button
+              variant='ghost'
+              className='rounded-full felx gap-2 items-center'
+              onClick={() => setOpen(true)}
+            >
               <SearchIcon className='w-5 h-5' />
-              <span className='sr-only'>Search</span>
+              Search
             </Button>
-            <Button variant='ghost' size='icon' className='rounded-full'>
-              <BellIcon className='w-5 h-5' />
-              <span className='sr-only'>Notifications</span>
-            </Button>
-            <Button variant='ghost' size='icon' className='rounded-full'>
-              <img
-                src='/placeholder.svg'
-                width={32}
-                height={32}
-                alt='Avatar'
-                className='rounded-full'
-              />
-              <span className='sr-only'>Profile</span>
-            </Button>
+            <ModeToggle />
           </div>
+          <CommandPallete
+            open={open}
+            setOpen={setOpen}
+            loading={loading}
+            setLoading={setLoading}
+          />
         </header>
       </div>
-      <hr />
-      <Outlet />
-      <TanStackRouterDevtools />
     </>
-  ),
-});
-
-function PlayIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns='http://www.w3.org/2000/svg'
-      width='24'
-      height='24'
-      viewBox='0 0 24 24'
-      fill='none'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-    >
-      <polygon points='6 3 20 12 6 21 6 3' />
-    </svg>
   );
 }
 
@@ -95,26 +90,6 @@ function SearchIcon(props: React.SVGProps<SVGSVGElement>) {
     >
       <circle cx='11' cy='11' r='8' />
       <path d='m21 21-4.3-4.3' />
-    </svg>
-  );
-}
-
-function BellIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns='http://www.w3.org/2000/svg'
-      width='24'
-      height='24'
-      viewBox='0 0 24 24'
-      fill='none'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-    >
-      <path d='M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9' />
-      <path d='M10.3 21a1.94 1.94 0 0 0 3.4 0' />
     </svg>
   );
 }
